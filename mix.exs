@@ -4,6 +4,7 @@ defmodule Ledger.MixProject do
   def project do
     [
       app: :ledger,
+      escript: escript_config(),
       version: "0.1.0",
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
@@ -14,10 +15,9 @@ defmodule Ledger.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+    extra_applications: [:logger]
     ]
   end
-
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [

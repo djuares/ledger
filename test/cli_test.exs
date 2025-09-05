@@ -9,15 +9,15 @@ defmodule CliTest do
     assert parse_args(["--help", "anything"]) == :help
   end
   test "only values returned if only given" do
-    assert parse_args(["transaction"]) == {"transaction","transactions.csv", 0, "response.csv" }
+    assert parse_args(["transaction"]) == {"transaction","transactions.csv", "0", "response.csv" }
   end
     test "four values returned if three given" do
-    assert parse_args(["transaction", "input_file", "312", "output_file"]) == {"transaction", "input_file", 312, "output_file" }
+    assert parse_args(["transaction", "input_file", "312", "output_file"]) == {"transaction", "input_file", "312", "output_file" }
   end
   test "three values returned if three given" do
-    assert parse_args(["balance", "312", "money_type"]) == {"balance",312, "money_type"}
+    assert parse_args(["balance", "312", "money_type"]) == {"balance","312", "money_type"}
   end
     test "two values returned if two given" do
-    assert parse_args(["balance", "312"]) ==   {"balance", 312}
+    assert parse_args(["balance", "312"]) ==   {"balance", "312", "0"}
   end
 end
