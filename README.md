@@ -1,21 +1,17 @@
-# Ledger
+# Compilación del Ejecutable
 
-**TODO: Add description**
-
-## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `ledger` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:ledger, "~> 0.1.0"}
-  ]
-end
+```bash
+# Genera el ejecutable
+$ mix escript.build
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/ledger>.
+# Ejecución del Programa
 
+```bash
+# Ejecutar normalmente
+$ ./ledger transacciones -t=transac.csv -c1=345 -o=result.csv
+```
+```bash
+# Ejecutar con ayuda
+$ ./ledger --help
+```
