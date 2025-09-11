@@ -1,7 +1,7 @@
 defmodule Ledger.Balance do
 
   def list(origin_account, money_type) do
-    input_file = "trans.csv"
+    input_file = "data/input/trans.csv"
 
     case File.read(input_file) do
       {:ok, content} ->
@@ -115,7 +115,7 @@ end
 
 
 defp load_currencies() do
-  case File.read("money.csv") do
+  case File.read("data/input/money.csv") do
     {:ok, content} ->
       currencies_map = content
         |> String.split("\n", trim: true)

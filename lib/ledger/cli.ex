@@ -1,5 +1,5 @@
 defmodule Ledger.CLI do
-  @default [input_file: "trans.csv", origin_account: "0", output_file: "default_result.csv", money_type: "0"]
+  @default [input_file: "data/input/trans.csv", origin_account: "0", output_file: "default_result.csv", money_type: "0"]
 
   def main(argv) do
     argv

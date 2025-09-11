@@ -1,9 +1,0 @@
-{application,ledger,
-             [{config_mtime,1757029293},
-              {optional_applications,[]},
-              {applications,[kernel,stdlib,elixir,logger]},
-              {description,"ledger"},
-              {modules,['Elixir.Ledger','Elixir.Ledger.Balance',
-                        'Elixir.Ledger.CLI','Elixir.Ledger.Transactions']},
-              {registered,[]},
-              {vsn,"0.1.0"}]}.

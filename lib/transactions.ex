@@ -28,9 +28,11 @@ defmodule Ledger.Transactions do
   end
 
   defp write_output_file(output_file, content) do
-    case File.write(output_file, content) do
+    output_path = "data/output/#{output_file}"
+
+    case File.write(output_path, content) do
       :ok ->
-        IO.puts("Archivo guardado: #{output_file}")
+        IO.puts("Archivo guardado: #{output_path}")
         {:ok, content}
 
       {:error, error} ->
