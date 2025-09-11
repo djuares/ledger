@@ -9,14 +9,17 @@ $ mix escript.build
 
 ```bash
 # Ejecutar normalmente con ruta relativa
-$ ./ledger transaction -t=transac.csv -c1=345 -o=result.csv
+$ ./ledger transaction -t= <archivo.csv> -c1=345 -o= <archivo.csv>
 ```
 ```bash
 # Ruta absoluta 
-$ ./ledger transaction -t="/ruta/al/archivo/transac.csv" -c=345 -o=result.csv
+$ ./ledger transaction -t="/ruta/al/archivo/transac.csv" -c1=345 -o=result.csv
 ```
 ```bash
 # Ejecutar con ayuda
 $ ./ledger --help
 ```
 
+```bash
+$ ./ledger balance -c= <account> 
+```

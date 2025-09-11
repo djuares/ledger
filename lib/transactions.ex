@@ -9,17 +9,6 @@ defmodule Ledger.Transactions do
     end
   end
 
-  defp write_output_file(output_file, content) do
-    case File.write(output_file, content) do
-      :ok ->
-        IO.puts("Archivo guardado: #{output_file}")
-        {:ok, content}
-
-      {:error, error} ->
-        {:error, "Error al escribir: #{:file.format_error(error)}"}
-    end
-  end
-
   defp process_content(content, "0") do
     content
     |> String.split("\n")
@@ -36,5 +25,16 @@ defmodule Ledger.Transactions do
       Enum.at(parts, 5) == origin_account || Enum.at(parts, 6) == origin_account
     end)
     |> Enum.join("\n")
+  end
+
+  defp write_output_file(output_file, content) do
+    case File.write(output_file, content) do
+      :ok ->
+        IO.puts("Archivo guardado: #{output_file}")
+        {:ok, content}
+
+      {:error, error} ->
+        {:error, "Error al escribir: #{:file.format_error(error)}"}
+    end
   end
 end

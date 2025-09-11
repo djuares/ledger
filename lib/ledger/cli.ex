@@ -1,5 +1,5 @@
 defmodule Ledger.CLI do
-  @default [input_file: "trans.csv", origin_account: "0", output_file: "response.csv", money_type: "0"]
+  @default [input_file: "trans.csv", origin_account: "0", output_file: "default_result.csv", money_type: "0"]
 
   def main(argv) do
     argv
@@ -7,10 +7,7 @@ defmodule Ledger.CLI do
     |> process
   end
 
-  @spec parse_args([binary()]) ::
-          :help | {<<_::56>>, any(), any()} | {<<_::88>>, any(), any(), any()}
   def parse_args(argv) do
-    IO.inspect(argv, label: "Argumentos recibidos")
     {opts, args, _} = OptionParser.parse(
       argv,
       switches: [
@@ -29,12 +26,10 @@ defmodule Ledger.CLI do
 
       ]
     )
-    IO.inspect({args, opts}, label: "Args y Opts parseados")
     {args, opts}
     |> args_to_internal_representation()
   end
-  @spec args_to_internal_representation(any()) ::
-        :help | {<<_::56>>, any(), any()} | {<<_::88>>, any(), any(), any()}
+
   def args_to_internal_representation({["transaction"], opts}) do
     input_file = opts[:t] || @default[:input_file]
     origin_account = opts[:c] || @default[:origin_account]
@@ -44,7 +39,7 @@ defmodule Ledger.CLI do
   end
 
   def args_to_internal_representation({["balance"], opts}) do
-    origin_account = opts[:c] || @default[:origin_account]
+    origin_account = opts[:c]
     money_type = opts[:m] || @default[:money_type]
 
     {"balance", origin_account, money_type}
@@ -53,6 +48,7 @@ defmodule Ledger.CLI do
   def args_to_internal_representation(_) do
     :help
   end
+
   def process(:help) do
     IO.puts("""
     usage:
@@ -69,7 +65,7 @@ defmodule Ledger.CLI do
   end
 
   def process({"balance", origin_account, money_type}) do
-    Ledger.Balance.list({origin_account, money_type})
+    Ledger.Balance.list(origin_account, money_type)
     |> decode_response()
     |> IO.puts()
   end
