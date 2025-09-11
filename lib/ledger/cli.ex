@@ -51,8 +51,25 @@ defmodule Ledger.CLI do
   def process(:help) do
     IO.puts("""
     usage:
-        ./ledger transaction -t=input_file.csv -c=origin_account -o=output_file.csv
-        ./ledger balance -c=origin_account -m=money_type
+
+        ./ledger transaction [option]
+
+          Options:
+            -t : transaction file
+            -c1 : origin account
+            -o : output file
+
+        ./ledger balance -c1= [option]
+
+          Options:
+            -c1 : origin account
+            -m : money type
+
+        Examples:
+
+          ./ledger transaction -t=input_file.csv -c1=122 -o=output_file.csv
+
+          ./ledger balance -c1=122 -m=BTC
     """)
     System.halt(0)
   end

@@ -27,10 +27,10 @@ $ ./ledger transaction -t="/ruta/al/archivo/transac.csv" -c1=<account> -o="/ruta
 
 ## Balance
 ```bash
-$ ./ledger balance -c=<account> [opcion]
+$ ./ledger balance -c1=<account> [opcion]
 ```
 ```bash
-$ ./ledger balance -c=<account> -m=<money_type>
+$ ./ledger balance -c1=<account> -m=<money_type>
 ```
 # Ejecutar tests
 
