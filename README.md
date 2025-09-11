@@ -19,7 +19,7 @@ $ ./ledger transaction -t=<archivo.csv> -c1=<account> -o=<archivo.csv>
 ```
 ```bash
 # Ruta absoluta 
-$ ./ledger transaction -t="/ruta/al/archivo/transac.csv" -c1=<account> -o=result.csv
+$ ./ledger transaction -t="/ruta/al/archivo/transac.csv" -c1=<account> -o="/ruta/al/archivo/transac.csv"
 ```
 
 ## Balance
@@ -29,6 +29,5 @@ $ ./ledger balance -c=<account>
 # Ejecutar tests
 
 ```bash
-# Genera el ejecutable
 $ mix test
 ```
