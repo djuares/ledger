@@ -23,3 +23,9 @@ $ ./ledger --help
 ```bash
 $ ./ledger balance -c= <account> 
 ```
+# Ejecutar tests
+
+```bash
+# Genera el ejecutable
+$ mix test
+```

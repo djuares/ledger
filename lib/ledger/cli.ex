@@ -23,7 +23,6 @@ defmodule Ledger.CLI do
         c1: :c,
         o: :o,
         m: :m
-
       ]
     )
     {args, opts}
