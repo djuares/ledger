@@ -22,7 +22,7 @@ $ ./ledger transaction -t=<archivo.csv> -c1=<account> -o=<archivo.csv>
 ```
 ```bash
 # Ruta absoluta 
-$ ./ledger transaction -t="/ruta/al/archivo/transac.csv" -c1=<account> -o="/ruta/al/archivo/transac.csv"
+$ ./ledger transaction -t="/ruta/al/archivo/transac.csv" -c1=<account> -o="/ruta/al/archivo/output.csv"
 ```
 
 ## Balance
