@@ -14,6 +14,9 @@ $ ./ledger --help
 
 ## Transaction
 ```bash
+$ ./ledger transaction [opciones]
+```
+```bash
 # Ejecutar normalmente con ruta relativa
 $ ./ledger transaction -t=<archivo.csv> -c1=<account> -o=<archivo.csv>
 ```
@@ -24,7 +27,10 @@ $ ./ledger transaction -t="/ruta/al/archivo/transac.csv" -c1=<account> -o="/ruta
 
 ## Balance
 ```bash
-$ ./ledger balance -c=<account> 
+$ ./ledger balance -c=<account> [opcion]
+```
+```bash
+$ ./ledger balance -c=<account> -m=<money_type>
 ```
 # Ejecutar tests
 
