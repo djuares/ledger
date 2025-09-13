@@ -8,16 +8,16 @@ defmodule CliTest do
     assert parse_args(["-h",     "anything"]) == :help
     assert parse_args(["--help", "anything"]) == :help
   end
-  test "only values returned if only given" do
-    assert parse_args(["transaction"]) == {"transaction","trans.csv", "0", "default_result.csv" }
+  test "transaction default" do
+    assert parse_args(["transaction"]) == {"transaction","data/input/trans.csv", "0", "data/output/default_result.csv" }
   end
-    test "four values returned if three given" do
+    test "transaction with arguments" do
     assert parse_args(["transaction", "-t=input_file", "-c1=312", "-o=output_file"]) == {"transaction", "input_file", "312", "output_file"}
   end
-  test "three values returned if three given" do
+  test "balance with arguments" do
     assert parse_args(["balance", "-c1=312", "-m=money_type"]) == {"balance","312", "money_type"}
   end
-    test "two values returned if two given" do
+    test "balance default" do
     assert parse_args(["balance", "-c1=312"]) ==   {"balance", "312", "0"}
   end
 end

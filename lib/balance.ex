@@ -1,54 +1,110 @@
 defmodule Ledger.Balance do
 
-  def list(origin_account, money_type) do
-    input_file = "data/input/trans.csv"
+def list(origin_account, money_type) do
+  input_file = "data/input/trans.csv"
 
-    case File.read(input_file) do
-      {:ok, content} ->
-        total_balance = process_content(content, origin_account, money_type)
-        formatted_result = format_balance(total_balance)
-        {:ok, formatted_result}
-
-      {:error, reason} ->
-        {:error, "No se pudo leer el archivo: #{reason}"}
-    end
+  case File.read(input_file) do
+    {:ok, content} ->
+      case process_content(content, origin_account, money_type) do
+        {:error, message} ->
+          {:error, message}
+        total_balance ->
+          formatted_result = format_balance(total_balance)
+          formatted_result
+      end
+    {:error, reason} ->
+      {:error, "No se pudo leer el archivo: #{reason}"}
   end
+end
 
 defp process_content(content, origin_account, "0") do
-  {list_5, list_6} = content
+  lines = content
     |> String.split("\n")
     |> Enum.filter(&(&1 != ""))
-    |> Enum.reduce({[], []}, fn line, {acc_5, acc_6} ->
-      parts = String.split(line, ";")
+    |> Enum.with_index(1)
 
-      cond do
-        Enum.at(parts, 5) == origin_account && Enum.at(parts,7)=="transfer" ->
-          {[line | acc_5], acc_6}
-        Enum.at(parts, 6) == origin_account  && Enum.at(parts,7)=="transfer"->
-          {acc_5, [line | acc_6]}
-        Enum.at(parts, 5) == origin_account && Enum.at(parts,7)=="alta_cuenta" ->
-          {acc_5, [line | acc_6]}
-        Enum.at(parts, 5) == origin_account && Enum.at(parts,7)=="swap" ->
-          {acc_5, [line | acc_6]}
-        Enum.at(parts, 6) == origin_account ->
-          {acc_5, [line | acc_6]}
-        true ->
-          {acc_5, acc_6}
-      end
-    end)
-    |> then(fn {l5, l6} -> {Enum.reverse(l5), Enum.reverse(l6)} end)
+  validation_result = Enum.reduce_while(lines, :ok, fn {line, line_number}, acc ->
+    case validate_line_format(line, line_number) do
+      :ok -> {:cont, acc}
+      {:error, message} -> {:halt, {:error, message}}
+    end
+  end)
 
-  result2 = debit_balance(list_5)
-  result = acredit_balance(list_6)
-  total_balance = combine_balances(result, result2)
-  total_balance
+  case validation_result do
+    {:error, message} ->
+      {:error, message}
 
+
+    :ok ->
+      {list_5, list_6} = Enum.reduce(lines, {[], []}, fn {line, _line_number}, {acc_5, acc_6} ->
+        parts = String.split(line, ";")
+
+        cond do
+          Enum.at(parts, 5) == origin_account && Enum.at(parts, 7) == "transfer" ->
+            {[line | acc_5], acc_6}
+          Enum.at(parts, 6) == origin_account && Enum.at(parts, 7) == "transfer" ->
+            {acc_5, [line | acc_6]}
+          Enum.at(parts, 5) == origin_account && Enum.at(parts, 7) == "alta_cuenta" ->
+            {acc_5, [line | acc_6]}
+          Enum.at(parts, 5) == origin_account && Enum.at(parts, 7) == "swap" ->
+            {acc_5, [line | acc_6]}
+          Enum.at(parts, 6) == origin_account ->
+            {acc_5, [line | acc_6]}
+          true ->
+            {acc_5, acc_6}
+        end
+      end)
+      |> then(fn {l5, l6} -> {Enum.reverse(l5), Enum.reverse(l6)} end)
+
+      result2 = debit_balance(list_5)
+      result = acredit_balance(list_6)
+      total_balance = combine_balances(result, result2)
+      {:ok, total_balance}
+  end
 end
 
 defp process_content(content, origin_account, money_type) do
   balance_map=process_content(content, origin_account, "0")
   balance_convert= convert_all_balances(balance_map, money_type)
   balance_convert
+end
+
+defp validate_line_format(line, line_number) do
+  parts = String.split(line, ";")
+
+  cond do
+    length(parts) != 8 ->
+      {:error, line_number}
+
+    not is_valid_integer(Enum.at(parts, 0)) ->
+      {:error, line_number}
+
+    not is_valid_integer(Enum.at(parts, 1)) ->
+      {:error, line_number}
+
+    Enum.at(parts, 4) == "" or not is_valid_float(Enum.at(parts, 4)) ->
+      {:error, line_number}
+
+    Enum.at(parts, 7) not in ["transfer", "alta_cuenta", "swap"] ->
+      {:error, line_number}
+
+    true ->
+      :ok
+  end
+end
+
+defp is_valid_integer(string) do
+  case Integer.parse(string) do
+    {_int, ""} -> true
+    _ -> false
+  end
+end
+
+defp is_valid_float(string) do
+  case Float.parse(string) do
+    {_float, ""} -> true
+    _ -> false
+  end
 end
 
 defp acredit_balance(accreditations) do
@@ -111,13 +167,14 @@ defp combine_balances(acredit_balances, debit_balances) do
   end)
 end
 
-  # Función para formatear el balance como string
-defp format_balance(balance_map) do
-    balance_map
+defp format_balance({:ok, balance_map}) do
+  formatted_balance = balance_map
     |> Enum.map(fn {currency, amount} ->
-      "#{currency}: #{Float.round(amount, 6)}"
+      "#{currency}=#{amount}"
     end)
     |> Enum.join("\n")
+
+  {:ok, formatted_balance}
 end
 
 
@@ -131,7 +188,7 @@ defp convert(money1, money2, amount) do
       rate2 = currencies[money2_up]
 
       intermediate = amount * rate1
-      result = intermediate * rate2
+      result = (intermediate / rate2)
       final_result = Float.round(result, 6)
 
       {:ok, final_result}
@@ -150,9 +207,7 @@ defp load_currencies() do
           {rate_float, _} = Float.parse(rate)
           Map.put(acc, String.upcase(currency), rate_float)
         end)
-
       currencies_map
-
   end
 end
 

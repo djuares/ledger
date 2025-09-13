@@ -91,5 +91,5 @@ defmodule Ledger.CLI do
   end
 
   def decode_response({:ok, body}), do: body
-  def decode_response({:error, reason}), do: "Error: #{reason}"
+  def decode_response({:error, reason}), do: " {:error, #{inspect(reason)}}"
 end
