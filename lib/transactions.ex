@@ -22,17 +22,15 @@ defmodule Ledger.Transactions do
     |> Enum.filter(&(&1 != ""))
     |> Enum.filter(fn line ->
       parts = String.split(line, ";")
-      Enum.at(parts, 5) == origin_account || Enum.at(parts, 6) == origin_account
+      Enum.at(parts, 5) == origin_account
     end)
     |> Enum.join("\n")
   end
 
   defp write_output_file(output_file, content) do
-    output_path = "data/output/#{output_file}"
-
-    case File.write(output_path, content) do
+    case File.write(output_file, content) do
       :ok ->
-        IO.puts("Archivo guardado: #{output_path}")
+        IO.puts("Archivo guardado: #{output_file}")
         {:ok, content}
 
       {:error, error} ->

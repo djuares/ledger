@@ -22,8 +22,14 @@ defp process_content(content, origin_account, "0") do
       parts = String.split(line, ";")
 
       cond do
-        Enum.at(parts, 5) == origin_account ->
+        Enum.at(parts, 5) == origin_account && Enum.at(parts,7)=="transfer" ->
           {[line | acc_5], acc_6}
+        Enum.at(parts, 6) == origin_account  && Enum.at(parts,7)=="transfer"->
+          {acc_5, [line | acc_6]}
+        Enum.at(parts, 5) == origin_account && Enum.at(parts,7)=="alta_cuenta" ->
+          {acc_5, [line | acc_6]}
+        Enum.at(parts, 5) == origin_account && Enum.at(parts,7)=="swap" ->
+          {acc_5, [line | acc_6]}
         Enum.at(parts, 6) == origin_account ->
           {acc_5, [line | acc_6]}
         true ->
@@ -31,16 +37,56 @@ defp process_content(content, origin_account, "0") do
       end
     end)
     |> then(fn {l5, l6} -> {Enum.reverse(l5), Enum.reverse(l6)} end)
-  result = acredit_balance(list_6)
+
   result2 = debit_balance(list_5)
+  result = acredit_balance(list_6)
   total_balance = combine_balances(result, result2)
   total_balance
+
 end
 
 defp process_content(content, origin_account, money_type) do
   balance_map=process_content(content, origin_account, "0")
   balance_convert= convert_all_balances(balance_map, money_type)
   balance_convert
+end
+
+defp acredit_balance(accreditations) do
+  Enum.reduce(accreditations, %{}, fn accreditation, acc ->
+    [_, _, moneda_origen, moneda_destino, monto_str, _, _, tipo_operacion] = String.split(accreditation, ";")
+    {monto, _} = Float.parse(monto_str)
+
+    case tipo_operacion do
+      "swap" ->
+        with {:ok, converted_amount} <- convert(moneda_origen, moneda_destino, monto) do
+          acc
+          |> Map.update(moneda_origen, -monto, &(&1 - monto))  # Restar de moneda origen
+          |> Map.update(moneda_destino, converted_amount, &(&1 + converted_amount))  # Sumar a moneda destino
+        else
+          _ -> acc
+        end
+
+      _ ->
+        case moneda_destino do
+          "" ->
+            Map.update(acc, moneda_origen, monto, &(&1 + monto))
+
+          destino ->
+            with {:ok, converted_amount} <- convert(moneda_origen, destino, monto) do
+              Map.update(acc, destino, converted_amount, &(&1 + converted_amount))
+            else
+              _ -> acc
+            end
+        end
+    end
+  end)
+end
+defp debit_balance(debits) do
+    Enum.reduce(debits, %{}, fn debit, acc ->
+      [_, _, moneda_origen, _, monto_str, _, _, _] = String.split(debit, ";")
+      {monto, _} = Float.parse(monto_str)
+      Map.update(acc, moneda_origen, -monto, &(&1 - monto))
+    end)
 end
 
 defp convert_all_balances(balance_map, money_type) do
@@ -58,25 +104,6 @@ defp convert_all_balances(balance_map, money_type) do
   %{money_type => total}
 end
 
-defp acredit_balance(accreditations) do
-    Enum.reduce(accreditations, %{}, fn accreditation, acc ->
-      [_, _, moneda_origen, moneda_destino, monto_str, _, _, _] = String.split(accreditation, ";")
-      {monto, _} = Float.parse(monto_str)
-      with {:ok, converted_amount} <- convert(moneda_origen, moneda_destino, monto) do
-        Map.update(acc, moneda_destino, converted_amount, &(&1 + converted_amount))
-      else
-        _ -> acc  # En caso de error en la conversión, simplemente ignorar esta transacción
-      end
-    end)
-end
-
-defp debit_balance(debits) do
-    Enum.reduce(debits, %{}, fn debit, acc ->
-      [_, _, moneda_origen, _, monto_str, _, _, _] = String.split(debit, ";")
-      {monto, _} = Float.parse(monto_str)
-      Map.update(acc, moneda_origen, -monto, &(&1 - monto))
-    end)
-end
 
 defp combine_balances(acredit_balances, debit_balances) do
   Map.merge(acredit_balances, debit_balances, fn _currency, acredit_amount, debit_amount ->
@@ -111,8 +138,7 @@ defp convert(money1, money2, amount) do
     else
       {:error, "Una o ambas monedas no son válidas"}
     end
-end
-
+  end
 
 defp load_currencies() do
   case File.read("data/input/money.csv") do
@@ -127,16 +153,6 @@ defp load_currencies() do
 
       currencies_map
 
-    {:error, reason} ->
-      # Valores por defecto en caso de que el archivo no exista
-      default_currencies = %{
-        "BTC" => 55000.0,
-        "ETH" => 3000.0,
-        "ARS" => 0.0012,
-        "USDT" => 1.0,
-        "EUR" => 1.18
-      }
-      default_currencies
   end
 end
 

@@ -1,5 +1,5 @@
 defmodule Ledger.CLI do
-  @default [input_file: "data/input/trans.csv", origin_account: "0", output_file: "default_result.csv", money_type: "0"]
+  @default [input_file: "data/input/trans.csv", origin_account: "0", output_file: "data/output/default_result.csv", money_type: "0"]
 
   def main(argv) do
     argv
@@ -38,10 +38,14 @@ defmodule Ledger.CLI do
   end
 
   def args_to_internal_representation({["balance"], opts}) do
-    origin_account = opts[:c]
-    money_type = opts[:m] || @default[:money_type]
-
-    {"balance", origin_account, money_type}
+    if is_nil(opts[:c]) do
+      IO.puts(:stderr, "Falta un argumento requerido: -c1=<cuenta>")
+      System.halt(1)
+    else
+      origin_account = opts[:c]
+      money_type = opts[:m] || @default[:money_type]
+      {"balance", origin_account, money_type}
+    end
   end
 
   def args_to_internal_representation(_) do
