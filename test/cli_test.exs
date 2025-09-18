@@ -1,8 +1,7 @@
 
 defmodule CliTest do
   use ExUnit.Case
-
-  import Ledger.CLI, only: [ parse_args: 1]
+  import Ledger.CLI
 
   test ":help returned by option parsing with -h and --help options" do
     assert parse_args(["-h",     "anything"]) == :help
@@ -20,4 +19,9 @@ defmodule CliTest do
     test "balance default" do
     assert parse_args(["balance", "-c1=312"]) ==   {"balance", "312", "0"}
   end
+  test "Se devueelve la linea incorrecta en caso de formato incorrecto" do
+    assert decode_response({:error, 1}) ==  " {:error, 1}"
+  end
+
+
 end
