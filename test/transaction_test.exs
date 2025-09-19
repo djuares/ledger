@@ -16,7 +16,7 @@ defmodule TransactionsTest do
             }
   end
   test "Transaction lista por cuenta coorectamente sin movimientos" do
-    assert Ledger.Balance.list("999", "0") ==  {:ok, ""}
+    assert Ledger.Transactions.list("data/input/test.csv","999", "0") ==  {:ok, ""}
   end
 
 end
