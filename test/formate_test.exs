@@ -1,10 +1,10 @@
 defmodule FormatTest do
   use ExUnit.Case
 
-  # Tests para validate_line_format/2
+  describe "validate_line_format" do
     test "línea válida devuelve :ok" do
       valid_line = "1;1754937004;BTC;USDT;1.5;122;555;transfer"
-      assert :ok = Ledger.FormatLedger.validate_line_format(valid_line, 1)
+      assert {:ok, "1"} = Ledger.FormatLedger.validate_line_format(valid_line, 1)
     end
 
     test "error cuando número de campos incorrecto" do
@@ -38,19 +38,50 @@ defmodule FormatTest do
       assert {:error, 1} = Ledger.FormatLedger.validate_line_format(invalid_line, 1)
     end
 
-    test "operaiones válidas: transfer, alta_cuenta, swap" do
+    test "operaciones válidas: transfer, alta_cuenta, swap" do
       valid_transfer = "1;1754937004;BTC;USDT;1.5;122;555;transfer"
       valid_alta = "1;1754937004;BTC;USDT;1.5;122;555;alta_cuenta"
       valid_swap = "1;1754937004;BTC;USDT;1.5;122;555;swap"
 
-      assert :ok = Ledger.FormatLedger.validate_line_format(valid_transfer, 1)
-      assert :ok = Ledger.FormatLedger.validate_line_format(valid_alta, 2)
-      assert :ok = Ledger.FormatLedger.validate_line_format(valid_swap, 3)
+      assert  {:ok, "1"} = Ledger.FormatLedger.validate_line_format(valid_transfer, 1)
+      assert {:ok, "1"} = Ledger.FormatLedger.validate_line_format(valid_alta, 2)
+      assert  {:ok, "1"} = Ledger.FormatLedger.validate_line_format(valid_swap, 3)
     end
 
+    test "procesa contenido con IDs únicos correctamente" do
+      content = """
+      123;1754937004;BTC;USDT;1.5;122;555;transfer
+      456;1754937004;BTC;USDT;2.0;122;555;transfer
+      789;1754937004;BTC;USDT;3.0;122;555;transfer
+      """
 
-  # Tests para format_balance/1
-  describe "format_balance/1" do
+      assert {:ok, _balance} = Ledger.Balance.process_content(content, "122", "0")
+    end
+
+    test "rechaza contenido con IDs duplicados" do
+      content = """
+      123;1754937004;BTC;USDT;1.5;122;555;transfer
+      123;1754937004;BTC;USDT;2.0;122;555;transfer
+      """
+
+      assert{:error, 2} =
+               Ledger.Balance.process_content(content, "122", "0")
+    end
+
+    test "rechaza IDs duplicados no consecutivos" do
+      content = """
+      123;1754937004;BTC;USDT;1.5;122;555;transfer
+      456;1754937004;BTC;USDT;2.0;122;555;transfer
+      123;1754937004;BTC;USDT;3.0;122;555;transfer
+      """
+
+      assert {:error, 3} =
+               Ledger.Balance.process_content(content, "122", "0")
+    end
+  end
+
+  describe "format_balance" do
+
     test "formatea mapa de balances correctamente" do
       balance_map = %{"BTC" => 1.5, "USDT" => 50000.0, "ETH" => 2.0}
 

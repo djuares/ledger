@@ -4,12 +4,16 @@ defmodule TransactionsTest do
   @sample_content "1;1754937004;USDT;ETH;100.50;555;122;transfer\n2;1754937004;ETH;USDT;50.25;122;144;transfer"
 
   test "transacciones procesa contenido csv correctamente" do
-    assert Ledger.Transactions.list("data/input/test.csv", "0", "data/output/default_result.csv") == {:ok,
-    "1;1754937004;USDT;BTC;55000;133;122;transfer\n1;1754937004;BTC;USDT;1;122;555;transfer\n1;1754937004;BTC;ETH;2;555;122;transfer\n1;1754937004;BTC;BTC;0.1;555;122;transfer\n1;1754937004;BTC;USDT;0.1;122;;swap\n1;1754937004;ARS;;70000;122;;alta_cuenta\n1;1754937004;ARS;ETH;70000;122;555;transfer"}
+    assert Ledger.Transactions.list("data/input/test.csv", "0", "data/output/default_result.csv") == {
+              :ok,
+              "1;1754937014;USDT;BTC;55000;133;122;transfer\n2;1754937024;BTC;USDT;1;122;555;transfer\n3;1754937034;BTC;ETH;2;555;122;transfer\n4;1754937054;BTC;BTC;0.1;555;122;transfer\n5;1754937044;BTC;USDT;0.1;122;;swap\n6;1754937074;ARS;;70000;122;;alta_cuenta\n7;1754937094;ARS;ETH;70000;122;555;transfer"
+            }
   end
   test "transacciones procesa origin_account correctamente" do
-    assert Ledger.Transactions.list("data/input/test.csv", "122", "data/output/default_output.csv") == {:ok,
-    "1;1754937004;BTC;USDT;1;122;555;transfer\n1;1754937004;BTC;USDT;0.1;122;;swap\n1;1754937004;ARS;;70000;122;;alta_cuenta\n1;1754937004;ARS;ETH;70000;122;555;transfer"}
+    assert Ledger.Transactions.list("data/input/test.csv", "122", "data/output/default_output.csv") == {
+              :ok,
+              "2;1754937024;BTC;USDT;1;122;555;transfer\n5;1754937044;BTC;USDT;0.1;122;;swap\n6;1754937074;ARS;;70000;122;;alta_cuenta\n7;1754937094;ARS;ETH;70000;122;555;transfer"
+            }
   end
   test "Transaction lista por cuenta coorectamente sin movimientos" do
     assert Ledger.Balance.list("999", "0") ==  {:ok, ""}

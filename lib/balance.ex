@@ -23,10 +23,16 @@ def process_content(content, origin_account, "0") do
     |> Enum.filter(&(&1 != ""))
     |> Enum.with_index(1)
 
-  validation_result = Enum.reduce_while(lines, :ok, fn {line, line_number}, acc ->
-    case Ledger.FormatLedger.validate_line_format(line, line_number) do
-      :ok -> {:cont, acc}
-      {:error, message} -> {:halt, {:error, message}}
+  # Cambiar la validación para usar MapSet y verificar IDs únicos
+  validation_result = Enum.reduce_while(lines, {:ok, MapSet.new()}, fn {line, line_number}, {:ok, existing_ids} ->
+    case Ledger.FormatLedger.validate_line_format(line, line_number, existing_ids) do
+      {:ok, transaction_id} ->
+        # Agregar el ID al conjunto y continuar
+        new_ids = MapSet.put(existing_ids, transaction_id)
+        {:cont, {:ok, new_ids}}
+
+      {:error, message} ->
+        {:halt, {:error, message}}
     end
   end)
 
@@ -34,8 +40,7 @@ def process_content(content, origin_account, "0") do
     {:error, message} ->
       {:error, message}
 
-
-    :ok ->
+    {:ok, _} ->
       {list_5, list_6} = Enum.reduce(lines, {[], []}, fn {line, _line_number}, {acc_5, acc_6} ->
         parts = String.split(line, ";")
 
