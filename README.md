@@ -18,11 +18,11 @@ $ ./ledger transaction [opciones]
 ```
 ```bash
 # Ejecutar normalmente con ruta relativa
-$ ./ledger transaction -t=<archivo.csv> -c1=<account> -o=<archivo.csv>
+$ ./ledger transaction -t=<archivo.csv> -c1=<account> -c2=<account> -o=<archivo.csv>
 ```
 ```bash
 # Ruta absoluta 
-$ ./ledger transaction -t="/ruta/al/archivo/transac.csv" -c1=<account> -o="/ruta/al/archivo/output.csv"
+$ ./ledger transaction -t="/ruta/al/archivo/transac.csv" -c1=<account> -c2=<account> -o="/ruta/al/archivo/output.csv"
 ```
 
 ## Balance
@@ -30,10 +30,9 @@ $ ./ledger transaction -t="/ruta/al/archivo/transac.csv" -c1=<account> -o="/ruta
 $ ./ledger balance -c1=<account> [opcion]
 ```
 ```bash
-$ ./ledger balance -c1=<account> -m=<money_type>
+$ ./ledger balance -t=<archivo.csv> -c1=<account> -o=<archivo.csv> -m=<money_type>
 ```
 # Ejecutar tests
-
 ```bash
 $ mix test
 ```

@@ -66,12 +66,15 @@ defmodule Ledger.CLI do
           Options:
             -t : transaction file
             -c1 : origin account
+            -c2 : destinate account
             -o : output file
 
         ./ledger balance -c1= [option]
 
           Options:
+            -t : transaction file
             -c1 : origin account
+            -o : output file
             -m : money type
 
         Examples:
