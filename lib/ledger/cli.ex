@@ -1,5 +1,5 @@
 defmodule Ledger.CLI do
-  @default [input_file: "data/input/trans.csv", origin_account: "0", output_file: "data/output/default_result.csv", money_type: "0"]
+  @default [input_file: "data/input/trans.csv", origin_account: "0",destinate_account: "0", output_file: "data/output/default_output.csv", money_type: "0"]
 
   def main(argv) do
     argv
@@ -13,14 +13,16 @@ defmodule Ledger.CLI do
       switches: [
         help: :boolean,
         t: :string,
-        c: :string,
+        c1: :string,
+        c2: :string,
         o: :string,
         m: :string
       ],
       aliases: [
         h: :help,
         t: :t,
-        c1: :c,
+        c1: :c1,
+        c2: :c2,
         o: :o,
         m: :m
       ]
@@ -31,20 +33,23 @@ defmodule Ledger.CLI do
 
   def args_to_internal_representation({["transaction"], opts}) do
     input_file = opts[:t] || @default[:input_file]
-    origin_account = opts[:c] || @default[:origin_account]
+    origin_account = opts[:c1] || @default[:origin_account]
+    destinate_account = opts[:c2] || @default[:destinate_account]
     output_file = opts[:o] || @default[:output_file]
 
-    {"transaction", input_file, origin_account, output_file}
+    {"transaction", input_file, origin_account,destinate_account, output_file}
   end
 
   def args_to_internal_representation({["balance"], opts}) do
-    if is_nil(opts[:c]) do
+    if is_nil(opts[:c1]) do
       IO.puts(:stderr, "Falta un argumento requerido: -c1=<cuenta>")
       System.halt(1)
     else
-      origin_account = opts[:c]
+      input_file = opts[:t] || @default[:input_file]
+      origin_account = opts[:c1]
       money_type = opts[:m] || @default[:money_type]
-      {"balance", origin_account, money_type}
+      output_file = opts[:o] || @default[:output_file]
+      {"balance", input_file, origin_account, money_type, output_file}
     end
   end
 
@@ -78,14 +83,14 @@ defmodule Ledger.CLI do
     System.halt(0)
   end
 
-  def process({"transaction", input_file, origin_account, output_file}) do
-    Ledger.Transactions.list(input_file, origin_account, output_file)
+  def process({"transaction", input_file, origin_account, destinate_account, output_file}) do
+    Ledger.Transactions.list(input_file, origin_account, destinate_account, output_file)
     |> decode_response()
     |> IO.puts()
   end
 
-  def process({"balance", origin_account, money_type}) do
-    Ledger.Balance.list(origin_account, money_type)
+  def process({"balance", input_file, origin_account, money_type, output_file}) do
+    Ledger.Balance.list(input_file,origin_account,  money_type, output_file)
     |> decode_response()
     |> IO.puts()
   end

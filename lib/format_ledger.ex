@@ -42,13 +42,14 @@ defp is_valid_float(string) do
     _ -> false
   end
 end
-def format_balance({:ok, balance_map}) do
-  formatted_balance = balance_map
+def format_balance(balance) when is_map(balance) do
+  formatted =
+    balance
     |> Enum.map(fn {currency, amount} ->
       "#{currency}=#{amount}"
     end)
     |> Enum.join("\n")
 
-  {:ok, formatted_balance}
+  {:ok, formatted}
 end
 end

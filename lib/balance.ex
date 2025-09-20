@@ -1,16 +1,22 @@
 defmodule Ledger.Balance do
 
-def list(origin_account, money_type) do
-  input_file = "data/input/trans.csv"
-
+def list(input_file, origin_account,  money_type, output_file) do
   case File.read(input_file) do
     {:ok, content} ->
       case process_content(content, origin_account, money_type) do
         {:error, message} ->
           {:error, message}
-        total_balance ->
-          formatted_result = Ledger.FormatLedger.format_balance(total_balance)
-          formatted_result
+        {:ok, total_balance} ->
+          case Ledger.FormatLedger.format_balance(total_balance) do
+            {:ok, formatted_result} ->
+              case File.write(output_file, formatted_result) do
+                :ok ->
+                  {:ok, formatted_result}
+                {:error, reason} ->
+                  {:error, "No se pudo escribir el archivo: #{reason}"}
+              end
+
+          end
       end
     {:error, reason} ->
       {:error, "No se pudo leer el archivo: #{reason}"}

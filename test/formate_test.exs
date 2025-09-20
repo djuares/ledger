@@ -46,6 +46,7 @@ defmodule FormatTest do
       assert  {:ok, "1"} = Ledger.FormatLedger.validate_line_format(valid_transfer, 1)
       assert {:ok, "1"} = Ledger.FormatLedger.validate_line_format(valid_alta, 2)
       assert  {:ok, "1"} = Ledger.FormatLedger.validate_line_format(valid_swap, 3)
+
     end
 
     test "procesa contenido con IDs únicos correctamente" do
@@ -86,29 +87,29 @@ defmodule FormatTest do
       balance_map = %{"BTC" => 1.5, "USDT" => 50000.0, "ETH" => 2.0}
 
       assert {:ok, "BTC=1.5\nETH=2.0\nUSDT=5.0e4"} =
-               Ledger.FormatLedger.format_balance({:ok, balance_map})
+               Ledger.FormatLedger.format_balance(balance_map)
     end
 
     test "mapa vacío devuelve string vacío" do
-      assert {:ok, ""} = Ledger.FormatLedger.format_balance({:ok, %{}})
+      assert {:ok, ""} = Ledger.FormatLedger.format_balance(%{})
     end
 
     test "un solo elemento en el mapa" do
-      assert {:ok, "BTC=1.5"} = Ledger.FormatLedger.format_balance({:ok, %{"BTC" => 1.5}})
+      assert {:ok, "BTC=1.5"} = Ledger.FormatLedger.format_balance(%{"BTC" => 1.5})
     end
 
     test "valores negativos se formatean correctamente" do
       balance_map = %{"BTC" => -1.5, "USDT" => -50000.0}
 
       assert {:ok, "BTC=-1.5\nUSDT=-5.0e4"} =
-               Ledger.FormatLedger.format_balance({:ok, balance_map})
+               Ledger.FormatLedger.format_balance(balance_map)
     end
 
     test "valores decimales con muchos decimales" do
       balance_map = %{"BTC" => 0.000001, "USDT" => 123.456789}
 
       assert {:ok, "BTC=1.0e-6\nUSDT=123.456789"}=
-               Ledger.FormatLedger.format_balance({:ok, balance_map})
+               Ledger.FormatLedger.format_balance(balance_map)
     end
   end
 
